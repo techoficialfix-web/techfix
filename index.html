@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Assistência Técnica</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#0f172a; color:#eee; margin:0; }
+    header { background:#111827; padding:10px; }
+    nav a { color:#22d3ee; margin-right:10px; text-decoration:none; }
+    .panel { background:#1f2937; padding:15px; margin:15px; border-radius:8px; }
+    input, textarea, select { width:100%; padding:8px; margin:4px 0; border-radius:6px; border:1px solid #333; background:#0b1220; color:#eee; }
+    button { padding:8px 12px; border-radius:6px; border:1px solid #333; background:#0b1220; color:#eee; cursor:pointer; }
+    table { width:100%; border-collapse: collapse; margin-top:10px; }
+    th, td { border:1px solid #333; padding:6px; }
+  </style>
+</head>
+<body>
+<header>
+  <nav>
+    <a href="#" onclick="showPanel('dashboard')">Dashboard</a>
+    <a href="#" onclick="showPanel('clientes')">Clientes</a>
+    <a href="#" onclick="showPanel('ordens')">Ordens</a>
+  </nav>
+</header>
+
+<div id="dashboard" class="panel">
+  <h2>Dashboard</h2>
+  <p>Total de clientes: <span id="totalClientes">0</span></p>
+  <p>Total de ordens: <span id="totalOrdens">0</span></p>
+</div>
+
+<div id="clientes" class="panel" style="display:none;">
+  <h2>Clientes</h2>
+  <form onsubmit="addCliente(); return false;">
+    <input id="nomeCliente" placeholder="Nome" required>
+    <input id="telefoneCliente" placeholder="Telefone">
+    <button type="submit">Adicionar Cliente</button>
+  </form>
+  <table>
+    <thead><tr><th>Nome</th><th>Telefone</th></tr></thead>
+    <tbody id="listaClientes"></tbody>
+  </table>
+</div>
+
+<div id="ordens" class="panel" style="display:none;">
+  <h2>Ordens de Serviço</h2>
+  <form onsubmit="addOrdem(); return false;">
+    <input id="descricaoOrdem" placeholder="Descrição" required>
+    <select id="clienteOrdem"></select>
+    <button type="submit">Adicionar OS</button>
+  </form>
+  <table>
+    <thead><tr><th>Descrição</th><th>Cliente</th></tr></thead>
+    <tbody id="listaOrdens"></tbody>
+  </table>
+</div>
+
+<script>
+let clientes = [];
+let ordens = [];
+
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.style.display='none');
+  document.getElementById(id).style.display='block';
+  updateDashboard();
+  updateClientesSelect();
+}
+
+function addCliente() {
+  const nome = document.getElementById('nomeCliente').value;
+  const tel = document.getElementById('telefoneCliente').value;
+  clientes.push({nome, tel});
+  document.getElementById('nomeCliente').value='';
+  document.getElementById('telefoneCliente').value='';
+  renderClientes();
+  updateDashboard();
+}
+
+function renderClientes() {
+  const tbody = document.getElementById('listaClientes');
+  tbody.innerHTML='';
+  clientes.forEach(c=>{
+    tbody.innerHTML += `<tr><td>${c.nome}</td><td>${c.tel}</td></tr>`;
+  });
+}
+
+function addOrdem() {
+  const desc = document.getElementById('descricaoOrdem').value;
+  const clienteIdx = document.getElementById('clienteOrdem').value;
+  if(clienteIdx===''){alert("Selecione um cliente");return;}
+  ordens.push({desc, cliente: clientes[clienteIdx].nome});
+  document.getElementById('descricaoOrdem').value='';
+  renderOrdens();
+  updateDashboard();
+}
+
+function renderOrdens() {
+  const tbody = document.getElementById('listaOrdens');
+  tbody.innerHTML='';
+  ordens.forEach(o=>{
+    tbody.innerHTML += `<tr><td>${o.desc}</td><td>${o.cliente}</td></tr>`;
+  });
+}
+
+function updateDashboard() {
+  document.getElementById('totalClientes').innerText = clientes.length;
+  document.getElementById('totalOrdens').innerText = ordens.length;
+}
+
+function updateClientesSelect() {
+  const sel = document.getElementById('clienteOrdem');
+  sel.innerHTML='<option value="">Selecione um cliente</option>';
+  clientes.forEach((c,i)=>{
+    sel.innerHTML += `<option value="${i}">${c.nome}</option>`;
+  });
+}
+</script>
+</body>
+</html>
